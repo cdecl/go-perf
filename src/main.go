@@ -42,34 +42,35 @@ func toFloat2(f float64) float64 {
 }
 
 func main() {
-	chm := make(chan float64)
-	chc := make(chan float64)
-	chavg := make(chan float64)
-	chswap := make(chan float64)
-	chdisk := make(chan float64)
 	chip := make(chan string)
+	chmap := make(map[string](chan float64))
+	chmap["cpu"] = make(chan float64)
+	chmap["mem"] = make(chan float64)
+	chmap["swap"] = make(chan float64)
+	chmap["loadavg"] = make(chan float64)
+	chmap["disk"] = make(chan float64)
 
 	go func() {
 		c, _ := cpu.Percent(time.Millisecond*300, false)
-		chc <- toFloat2(c[0])
+		chmap["cpu"] <- toFloat2(c[0])
 	}()
 
 	go func() {
 		vm, _ := mem.VirtualMemory()
-		chm <- toFloat2(vm.UsedPercent)
+		chmap["mem"] <- toFloat2(vm.UsedPercent)
 
 		swap, _ := mem.SwapMemory()
-		chswap <- toFloat2(swap.UsedPercent)
+		chmap["swap"] <- toFloat2(swap.UsedPercent)
 	}()
 
 	go func() {
 		avg, _ := load.Avg()
-		chavg <- toFloat2(avg.Load5)
+		chmap["loadavg"] <- toFloat2(avg.Load5)
 	}()
 
 	go func() {
 		disk, _ := disk.Usage("/")
-		chdisk <- toFloat2(disk.UsedPercent)
+		chmap["disk"] <- toFloat2(disk.UsedPercent)
 	}()
 
 	go func() {
@@ -90,12 +91,12 @@ func main() {
 	var info = SystemInfo{
 		Timestamp: time.Now().Format("20060102150405"),
 		Hostname:  hostname,
-		Mem:       <-chm,
-		Cpu:       <-chc,
-		Swap:      <-chswap,
-		Disk:      <-chdisk,
+		Mem:       <-chmap["mem"],
+		Cpu:       <-chmap["cpu"],
+		Swap:      <-chmap["swap"],
+		Disk:      <-chmap["disk"],
 		Ip:        <-chip,
-		LoadAvg:   <-chavg,
+		LoadAvg:   <-chmap["loadavg"],
 	}
 
 	js, _ := json.Marshal(info)
