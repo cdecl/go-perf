@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"time"
@@ -36,6 +37,10 @@ type SystemInfo struct {
 	LoadAvg   float64 `json:"loadavg"`
 }
 
+func toFloat2(f float64) float64 {
+	return math.Round(f*100) / 100
+}
+
 func main() {
 	chm := make(chan float64)
 	chc := make(chan float64)
@@ -46,25 +51,25 @@ func main() {
 
 	go func() {
 		c, _ := cpu.Percent(time.Millisecond*300, false)
-		chc <- c[0]
+		chc <- toFloat2(c[0])
 	}()
 
 	go func() {
 		vm, _ := mem.VirtualMemory()
-		chm <- vm.UsedPercent
+		chm <- toFloat2(vm.UsedPercent)
 
 		swap, _ := mem.SwapMemory()
-		chswap <- swap.UsedPercent
+		chswap <- toFloat2(swap.UsedPercent)
 	}()
 
 	go func() {
 		avg, _ := load.Avg()
-		chavg <- avg.Load5
+		chavg <- toFloat2(avg.Load5)
 	}()
 
 	go func() {
 		disk, _ := disk.Usage("/")
-		chdisk <- disk.UsedPercent
+		chdisk <- toFloat2(disk.UsedPercent)
 	}()
 
 	go func() {
