@@ -33,7 +33,7 @@ type SystemInfo struct {
 	Mem       float64 `json:"memory"`
 	Swap      float64 `json:"swap"`
 	Disk      float64 `json:"disk"`
-	Ip        float64 `json:"ip"`
+	Ip        string  `json:"ip"`
 	LoadAvg   float64 `json:"loadavg"`
 }
 
@@ -92,9 +92,10 @@ func main() {
 		Hostname:  hostname,
 		Mem:       <-chm,
 		Cpu:       <-chc,
-		LoadAvg:   <-chavg,
 		Swap:      <-chswap,
 		Disk:      <-chdisk,
+		Ip:        <-chip,
+		LoadAvg:   <-chavg,
 	}
 
 	js, _ := json.Marshal(info)
