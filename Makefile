@@ -1,8 +1,10 @@
 
 GOPATH=$(CURDIR)
 GOBIN=$(GOPATH)/bin
-GOFILES=$(wildcard src/*.go)
+GOFILES=perf
 EXEC=perf.exe
+
+all: build run
 
 build:
 	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -o $(GOBIN)/$(EXEC) $(GOFILES)
@@ -16,4 +18,4 @@ get:
 	
 cc:
 	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN)  GOOS=linux GOARCH=amd64 go build -o $(GOBIN)/linux/$(EXEC) $(GOFILES)
-	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN)  GOOS=windows GOARCH=amd64 go build -o $(GOBIN)/windows/$(EXEC) $(GOFILES)
+	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN)  GOOS=windows GOARCH=amd64 go build -o $(GOBIN)/windows/$(EXEC) $(GOFILES)make 
