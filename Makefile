@@ -1,20 +1,20 @@
 
-GOPATH=$(CURDIR)
-GOBIN=$(GOPATH)/bin
-GOFILES=perf
-EXEC=perf.exe
+PROJECT=perf
+BIN=$(CURDIR)/bin
+EXEC=$(PROJECT).exe
 
-all: build run
+
+all: build 
 
 build:
-	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -o $(GOBIN)/$(EXEC) $(GOFILES)
+	go build -o $(BIN)/$(EXEC)
 
-run:
-	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN) go run $(GOFILES)
+test:
+	go test -v 
 
-get:
-	-env GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -d ./...
+dep:
+	go mod tidy
 	
 cc:
-	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN)  GOOS=linux GOARCH=amd64 go build -o $(GOBIN)/linux/$(EXEC) $(GOFILES)
-	@env GOPATH=$(GOPATH) GOBIN=$(GOBIN)  GOOS=windows GOARCH=amd64 go build -o $(GOBIN)/windows/$(EXEC) $(GOFILES) 
+	SET GOOS=linux& SET GOARCH=amd64& go build -o $(BIN)/linux/$(EXEC) 
+	SET GOOS=windows& SET GOARCH=amd64& go build -o $(BIN)/windows/$(EXEC) 

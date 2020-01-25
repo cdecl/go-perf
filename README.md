@@ -5,13 +5,7 @@ Performance metrics
 #### Get (downloads the packages)
 
 ```sh
-make get 
-```
-
-#### Run
-
-```sh
-make run 
+make dep 
 ```
 
 #### Build 
