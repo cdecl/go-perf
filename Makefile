@@ -1,5 +1,5 @@
 
-PROJECT=perf
+PROJECT=go-perf
 BIN=$(CURDIR)/bin
 EXEC=$(PROJECT).exe
 

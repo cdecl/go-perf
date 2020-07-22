@@ -1,11 +1,12 @@
-module perf
+module go-perf
 
-go 1.13
+go 1.14
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
+	github.com/elastic/go-elasticsearch v0.0.0
+	github.com/elastic/go-elasticsearch/v7 v7.8.0
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/shirou/gopsutil v2.19.12+incompatible
-	github.com/stretchr/testify v1.4.0 // indirect
-	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
+	github.com/shirou/gopsutil v2.20.6+incompatible
+	golang.org/x/sys v0.0.0-20200720211630-cb9d2d5c5666 // indirect
 )
