@@ -1,44 +1,19 @@
 package main
 
 import (
-	"flag"
+	"encoding/json"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/kardianos/service"
 )
 
 type Args struct {
-	Index    string
-	Host     string
-	Interval int64
-}
-
-func usage() (Args, bool) {
-	args := Args{}
-	flag.StringVar(&args.Index, "i", "", "Elasticsearch index name (require)")
-	flag.StringVar(&args.Host, "h", "", "Elasticsearch host (require) e.g. http://localhost:9200")
-	flag.Int64Var(&args.Interval, "t", 20, "Interval : default :20 (seconds)")
-	flag.Parse()
-
-	isFlagPassed := func(name string) bool {
-		found := false
-		flag.Visit(func(f *flag.Flag) {
-			if f.Name == name {
-				found = true
-			}
-		})
-		return found
-	}
-
-	found := isFlagPassed("i")
-	found = found && isFlagPassed("h")
-
-	if !found {
-		flag.Usage()
-		return args, false
-	}
-	return args, true
+	Host     string `json:"host"`
+	Index    string `json:"index"`
+	Interval int64  `json:"interval"`
 }
 
 type program struct {
@@ -64,15 +39,48 @@ func (p *program) Stop(s service.Service) error {
 	return nil
 }
 
+func getConfigPath() string {
+	fullexecpath, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+
+	dir, execname := filepath.Split(fullexecpath)
+	ext := filepath.Ext(execname)
+	name := execname[:len(execname)-len(ext)]
+
+	return filepath.Join(dir, name+".json")
+}
+
+func getArgs() (Args, error) {
+	args := Args{}
+
+	f, err := os.Open(getConfigPath())
+	if err != nil {
+		return args, err
+	}
+	defer f.Close()
+
+	r := json.NewDecoder(f)
+	err = r.Decode(&args)
+	if err != nil {
+		return args, err
+	}
+	return args, nil
+}
+
 func main() {
-	args, ok := usage()
-	if !ok {
+	args, err := getArgs()
+	if err != nil {
+		log.Fatal("config load error")
 		return
 	}
 
+	log.Println(args)
+
 	svcConfig := &service.Config{
 		Name:        "GoPerf",
-		DisplayName: "GoPerf",
+		DisplayName: "INTERPARK GoPerf",
 	}
 
 	exec := &program{args}
@@ -81,14 +89,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger, err := svc.Logger(nil)
+	if len(os.Args) > 1 {
+		err := service.Control(svc, os.Args[1])
+		if err != nil {
+			log.Printf("Valid actions: %q\n", service.ControlAction)
+			log.Fatal(err)
+		}
+		return
+	}
+
+	svc.Run()
+	err = svc.Run()
 	if err != nil {
 		log.Fatal(err)
-	}
-	err = svc.Run()
-
-	if err != nil {
-		logger.Error(err)
 	}
 
 }
