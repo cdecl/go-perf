@@ -14,17 +14,6 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-type systemInfo struct {
-	Timestamp string  `json:"timestamp"`
-	Hostname  string  `json:"hostname"`
-	Cpu       float64 `json:"processor"`
-	Mem       float64 `json:"memory"`
-	Swap      float64 `json:"swap"`
-	Disk      float64 `json:"disk"`
-	Ip        string  `json:"ip"`
-	LoadAvg   float64 `json:"loadavg"`
-}
-
 func toFloat2(f float64) float64 {
 	return math.Round(f*100) / 100
 }
