@@ -15,7 +15,7 @@ import (
 func addCounter(q *pc.Query, path string) *pc.Counter {
 	c, err := q.AddCounter(path, 0)
 	if err != nil {
-		fmt.Println(path, err)
+		log.Println("addCounter: ", path, err)
 		return nil
 	}
 	return c
@@ -27,35 +27,55 @@ func getFmtValueSafe(c *pc.Counter, format uint32) uint64 {
 	if err == nil {
 		retval = rval.Value
 	} else {
-		fmt.Println("getFmtValueSafe", err)
+		log.Println("getFmtValueSafe", err)
 	}
 	return retval
+}
+
+func getIPAddr() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 func ReqCounter(sqlInstance string) map[string]interface{} {
 	q, err := pc.OpenQuery("", 0)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 	defer q.Close()
 
 	mv := make(map[string]interface{})
 	mc := make(map[string]*pc.Counter)
 	mc["Process"] = addCounter(q, `\Processor(_Total)\% Processor Time`)
-	defer mc["Process"].Remove()
-
 	mc["ProcessorQueueLength"] = addCounter(q, `\System\Processor Queue Length`)
-	defer mc["ProcessorQueueLength"].Remove()
-
 	mc["Memory"] = addCounter(q, `\Memory\% Committed Bytes In Use`)
-	defer mc["Memory"].Remove()
 
 	if len(sqlInstance) > 0 {
-		mc["BatchRequests"] = addCounter(q, `\SQLServer:SQL Statistics\Batch Requests/sec`)
-		defer mc["BatchRequests"].Remove()
+		mc["BatchRequests"] = addCounter(q, fmt.Sprintf(`\%s:SQL Statistics\Batch Requests/sec`, sqlInstance))
+		if mc["BatchRequests"] == nil {
+			delete(mc, "BatchRequests")
+		}
 
-		mc["UserConnections"] = addCounter(q, `\SQLServer:General Statistics\User Connections`)
-		defer mc["UserConnections"].Remove()
+		mc["UserConnections"] = addCounter(q, fmt.Sprintf(`\%s:General Statistics\User Connections`, sqlInstance))
+		if mc["UserConnections"] == nil {
+			delete(mc, "UserConnections")
+		}
+	}
+
+	// resouce clean
+	for _, m := range mc {
+		defer m.Remove()
 	}
 
 	err = q.CollectData()
@@ -77,22 +97,6 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	hostname, _ := os.Hostname()
 	mv["HostsName"] = hostname
 	mv["TimeStamp"] = time.Now().Format("2006-01-02 15:04:05")
-
-	getIPAddr := func() string {
-		addrs, err := net.InterfaceAddrs()
-		if err != nil {
-			return ""
-		}
-
-		for _, a := range addrs {
-			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.To4() != nil {
-					return ipnet.IP.String()
-				}
-			}
-		}
-		return ""
-	}
 	mv["IP"] = getIPAddr()
 
 	return mv

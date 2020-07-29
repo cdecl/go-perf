@@ -18,6 +18,22 @@ func toFloat2(f float64) float64 {
 	return math.Round(f*100) / 100
 }
 
+func getIPAddr() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
+}
+
 func ReqCounter(sqlInstance string) map[string]interface{} {
 	_ = sqlInstance
 	mv := make(map[string]interface{})
@@ -36,23 +52,6 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 
 	avg, _ := load.Avg()
 	mv["loadavg"] = toFloat2(avg.Load5)
-
-	getIPAddr := func() string {
-		addrs, err := net.InterfaceAddrs()
-		if err != nil {
-			return ""
-		}
-
-		for _, a := range addrs {
-			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.To4() != nil {
-					return ipnet.IP.String()
-				}
-			}
-		}
-		return ""
-	}
-
 	mv["ip"] = getIPAddr()
 	hostname, _ := os.Hostname()
 	mv["hostname"] = hostname
