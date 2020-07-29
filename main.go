@@ -23,9 +23,11 @@ type Args struct {
 
 type program struct {
 	args Args
+	exit chan struct{}
 }
 
 func (p *program) Start(s service.Service) error {
+	p.exit = make(chan struct{})
 	go p.run()
 	return nil
 }
@@ -34,10 +36,21 @@ func (p *program) run() {
 	p.reqDo()
 
 	ticker := time.NewTicker(time.Second * time.Duration(p.args.Interval))
-	for t := range ticker.C {
-		_ = t
-		p.reqDo()
+	for {
+		select {
+		case tm := <-ticker.C:
+			_ = tm
+			p.reqDo()
+		case <-p.exit:
+			ticker.Stop()
+			return
+		}
 	}
+}
+
+func (p *program) Stop(s service.Service) error {
+	close(p.exit)
+	return nil
 }
 
 func (p *program) reqDo() {
@@ -73,10 +86,6 @@ func (p *program) reqDo() {
 	}
 	defer res.Body.Close()
 	log.Println(res)
-}
-
-func (p *program) Stop(s service.Service) error {
-	return nil
 }
 
 func getConfigPath() string {
@@ -125,7 +134,7 @@ func main() {
 		DisplayName: "INTERPARK GoPerf",
 	}
 
-	exec := &program{args}
+	exec := &program{args, nil}
 	svc, err := service.New(exec, svcConfig)
 	if err != nil {
 		log.Fatal(err)
