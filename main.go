@@ -149,7 +149,6 @@ func main() {
 		return
 	}
 
-	svc.Run()
 	err = svc.Run()
 	if err != nil {
 		log.Fatal(err)
