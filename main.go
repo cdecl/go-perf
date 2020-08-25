@@ -131,7 +131,7 @@ func main() {
 
 	svcConfig := &service.Config{
 		Name:        "GoPerf",
-		DisplayName: "INTERPARK GoPerf",
+		Description: "INTERPARK GoPerf",
 	}
 
 	exec := &program{args, nil}
