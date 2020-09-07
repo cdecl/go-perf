@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/alexbrainman/pc"
+	"github.com/shirou/gopsutil/cpu"
 )
 
 func addCounter(q *pc.Query, path string) *pc.Counter {
@@ -49,6 +50,8 @@ func getIPAddr() string {
 }
 
 func ReqCounter(sqlInstance string) map[string]interface{} {
+	const sleepMillisecond = 500
+
 	q, err := pc.OpenQuery("", 0)
 	if err != nil {
 		log.Fatalln(err)
@@ -57,7 +60,11 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 
 	mv := make(map[string]interface{})
 	mc := make(map[string]*pc.Counter)
-	mc["Process"] = addCounter(q, `\Processor(_Total)\% Processor Time`)
+
+	c, _ := cpu.Percent(time.Millisecond*sleepMillisecond, false)
+	mv["Process"] = int(c[0])
+
+	mc["Process-pc"] = addCounter(q, `\Processor(_Total)\% Processor Time`)
 	mc["ProcessorQueueLength"] = addCounter(q, `\System\Processor Queue Length`)
 	mc["Memory"] = addCounter(q, `\Memory\% Committed Bytes In Use`)
 
@@ -83,7 +90,6 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 		log.Printf("CollectData failed: %v \n", err)
 	}
 
-	const sleepMillisecond = 300
 	time.Sleep(time.Millisecond * sleepMillisecond)
 
 	err = q.CollectData()
