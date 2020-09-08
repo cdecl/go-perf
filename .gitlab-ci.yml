@@ -3,7 +3,7 @@ stages:
   - deploy
 
 build_linux:
-  image: golang:1.15-alpine
+  image: infradb.inpark.kr:5000/infra/golang:latest
   stage: build
   only:
     changes:
