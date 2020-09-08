@@ -1,3 +1,4 @@
+[![pipeline status](http://hqgit.inpark.kr/system-doc/go-perf/badges/master/pipeline.svg)](http://hqgit.inpark.kr/system-doc/go-perf/-/commits/master)
 
 # go-perf
 Performance mertic 수집 및 ElasticSearch 데이터 전송 
