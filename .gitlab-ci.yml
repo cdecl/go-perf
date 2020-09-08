@@ -1,0 +1,20 @@
+stages:                  
+  - build
+  - deploy
+
+build_linux:
+  image: golang:1.15-alpine
+  stage: build
+  only:
+    changes:
+      - ansible.gitlab-ci.yml
+  script:
+    - go --verion
+    - make cc 
+    
+  artifacts:
+    paths:
+      - bin
+      
+  tags:
+    - infra
