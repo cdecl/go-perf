@@ -9,7 +9,7 @@ build_linux:
     changes:
       - ansible.gitlab-ci.yml
   script:
-    - go --verion
+    - go version
     - make cc 
     
   artifacts:
