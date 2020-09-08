@@ -7,7 +7,7 @@ EXEC=$(PROJECT)
 all: build 
 
 build:
-	go build -o $(BIN)/$(EXEC).exe
+	go build -o $(BIN)/$(EXEC)
 
 test:
 	go test -v 
@@ -16,5 +16,6 @@ dep:
 	go mod tidy
 	
 cc:
-	set GOOS=linux& set GOARCH=amd64& go build -o $(BIN)/$(EXEC) 
-	set GOOS=windows& set GOARCH=amd64& go build -o $(BIN)/$(EXEC).exe
+	GOOS=linux    GOARCH=amd64  go build -o $(BIN)/$(EXEC) 
+	GOOS=windows  GOARCH=amd64  go build -o $(BIN)/$(EXEC).exe
+
