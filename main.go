@@ -57,7 +57,7 @@ func (p *program) reqDo() {
 	dicPerf := ReqCounter(p.args.SqlInstance)
 	sb, err := json.Marshal(dicPerf)
 	if err != nil {
-		log.Fatalf("ReqCounter: %v", err)
+		log.Println("ReqCounter: %v", err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (p *program) reqDo() {
 	cfg := elasticsearch.Config{Addresses: []string{p.args.Host}}
 	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		log.Fatalf("NewClient: %v", err)
+		log.Println("NewClient: %v", err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (p *program) reqDo() {
 
 	res, err := req.Do(context.Background(), es)
 	if err != nil {
-		log.Fatalf("reqDo: %v", err)
+		log.Println("reqDo: %v", err)
 		return
 	}
 	defer res.Body.Close()

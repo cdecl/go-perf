@@ -39,10 +39,10 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	mv := make(map[string]interface{})
 
 	c, _ := cpu.Percent(time.Millisecond*300, false)
-	mv["cpu"] = toFloat2(c[0])
+	mv["processor"] = toFloat2(c[0])
 
 	vm, _ := mem.VirtualMemory()
-	mv["mem"] = toFloat2(vm.UsedPercent)
+	mv["memory"] = toFloat2(vm.UsedPercent)
 
 	swap, _ := mem.SwapMemory()
 	mv["swap"] = toFloat2(swap.UsedPercent)
