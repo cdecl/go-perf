@@ -62,9 +62,9 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	mc := make(map[string]*pc.Counter)
 
 	c, _ := cpu.Percent(time.Millisecond*sleepMillisecond, false)
-	mv["Process"] = int(c[0])
+	mv["Processor"] = int(c[0])
 
-	mc["Process-pc"] = addCounter(q, `\Processor(_Total)\% Processor Time`)
+	mc["Processor-pc"] = addCounter(q, `\Processor(_Total)\% Processor Time`)
 	mc["ProcessorQueueLength"] = addCounter(q, `\System\Processor Queue Length`)
 	mc["Memory"] = addCounter(q, `\Memory\% Committed Bytes In Use`)
 
