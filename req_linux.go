@@ -3,6 +3,7 @@
 package main
 
 import (
+	"log"
 	"math"
 	"net"
 	"os"
@@ -34,6 +35,38 @@ func getIPAddr() string {
 	return ""
 }
 
+func findStr(source []string, value string) bool {
+	for _, item := range source {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}
+
+func getDiskInfo() map[string]float64 {
+	diskMap := make(map[string]float64)
+	parts, err := disk.Partitions(true)
+	ignore := []string{
+		"/sys/fs/cgroup/devices", "binfmt_misc", "cgroup", "configfs", "debugfs", "devpts",
+		"devtmpfs", "fusectl", "hugetlbfs", "mqueue", "nfsd", "overlay", "proc", "pstore",
+		"securityfs", "shm", "sunrpc", "sysfs", "systemd-1", "tmpfs", "autofs", "rpc_pipefs",
+	}
+
+	if err != nil {
+		log.Println("get Partitions failed, err:%v\n", err)
+	}
+
+	for _, part := range parts {
+		result := findStr(ignore, part.Fstype)
+		if !result {
+			diskInfo, _ := disk.Usage(part.Mountpoint)
+			diskMap[diskInfo.Path] = toFloat2(diskInfo.UsedPercent)
+		}
+	}
+	return diskMap
+}
+
 func ReqCounter(sqlInstance string) map[string]interface{} {
 	_ = sqlInstance
 	mv := make(map[string]interface{})
@@ -47,8 +80,8 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	swap, _ := mem.SwapMemory()
 	mv["swap"] = toFloat2(swap.UsedPercent)
 
-	disk, _ := disk.Usage("/")
-	mv["disk"] = toFloat2(disk.UsedPercent)
+	// disk, _ := disk.Usage("/")
+	mv["disk"] = getDiskInfo()
 
 	avg, _ := load.Avg()
 	mv["loadavg"] = toFloat2(avg.Load5)

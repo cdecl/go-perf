@@ -5,12 +5,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"os"
 	"time"
 
 	"github.com/alexbrainman/pc"
 	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
 )
 
 func addCounter(q *pc.Query, path string) *pc.Counter {
@@ -47,6 +49,25 @@ func getIPAddr() string {
 		}
 	}
 	return ""
+}
+
+func toFloat2(f float64) float64 {
+	return math.Round(f*100) / 100
+}
+
+func getDiskInfo() map[string]float64 {
+	diskMap := make(map[string]float64)
+	parts, err := disk.Partitions(true)
+
+	if err != nil {
+		log.Println("get Partitions failed, err:%v\n", err)
+	}
+
+	for _, part := range parts {
+		diskInfo, _ := disk.Usage(part.Mountpoint)
+		diskMap[diskInfo.Path] = toFloat2(diskInfo.UsedPercent)
+	}
+	return diskMap
 }
 
 func ReqCounter(sqlInstance string) map[string]interface{} {
@@ -104,6 +125,7 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	mv["HostsName"] = hostname
 	mv["TimeStamp"] = time.Now().Format("2006-01-02 15:04:05")
 	mv["IP"] = getIPAddr()
+	mv["Disk"] = getDiskInfo()
 
 	return mv
 }
