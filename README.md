@@ -81,13 +81,59 @@ $ ./go-perf start
 $ ./go-perf uninstall 
 ```
 
-```sh
-# Windows 
-{"Disk":{"C:":91,"D:":13.06},"HostsName":"N15479-W02","IP":"192.168.137.1","Memory":86,"Processor":6,"Processor-pc":7,"ProcessorQueueLength":0,"TimeStamp":"2021-04-22 11:19:15"}
+### Output 형식 
+#### Windows 
+```json
+{
+	"Disk": {
+		"C:": 91,
+		"D:": 13.06
+	},
+	"HostsName": "N15479-W02",
+	"IP": "192.168.137.1",
+	"Memory": 86,
+	"Processor": 6,
+	"Processor-pc": 7,
+	"ProcessorQueueLength": 0,
+	"TimeStamp": "2021-04-22 11:19:15"
+}
+```
 
-# Windows (w/SQLServer)
- {"BatchRequests":0,"Disk":{"C:":91,"D:":13.06},"HostsName":"N15479-W02","IP":"192.168.137.1","Memory":86,"Processor":4,"Processor-pc":4,"ProcessorQueueLength":0,"TimeStamp":"2021-04-22 11:18:40","UserConnections":0}
+#### Windows (w/SQLServer)
+```json
+ {
+	"BatchRequests": 0,
+	"Disk": {
+		"C:": 91,
+		"D:": 13.06
+	},
+	"HostsName": "N15479-W02",
+	"IP": "192.168.137.1",
+	"Memory": 86,
+	"Processor": 4,
+	"Processor-pc": 4,
+	"ProcessorQueueLength": 0,
+	"TimeStamp": "2021-04-22 11:18:40",
+	"UserConnections": 0
+}
+```
 
-# Linux
-{"disk":{"/":11.76,"/boot":13.91,"/boot/efi":5.59,"/home":2.95,"/sys/firmware/efi/efivars":0},"hostname":"centos-cdecl","ip":"192.168.137.100","loadavg":0.01,"memory":19.13,"processor":0,"swap":0,"timestamp":"2021-04-22 11:19:39"}
+#### Linux
+```json
+{
+	"disk": {
+		"/": 11.76,
+		"/boot": 13.91,
+		"/boot/efi": 5.59,
+		"/home": 2.95,
+		"/sys/firmware/efi/efivars": 0
+	},
+	"hostname": "centos-cdecl",
+	"ip": "192.168.137.100",
+	"loadavg": 0.01,
+	"memory": 19.13,
+	"processor": 0,
+	"swap": 0,
+	"timestamp": "2021-04-22 11:19:39"
+}
 ```
