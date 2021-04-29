@@ -49,7 +49,7 @@ func getDiskInfo() map[string]float64 {
 	parts, err := disk.Partitions(true)
 	ignore := []string{
 		"/sys/fs/cgroup/devices", "binfmt_misc", "cgroup", "configfs", "debugfs", "devpts",
-		"devtmpfs", "fusectl", "hugetlbfs", "mqueue", "nfsd", "overlay", "proc", "pstore",
+		"devtmpfs", "fusectl", "hugetlbfs", "mqueue", "nfsd", "nfs", "overlay", "proc", "pstore",
 		"securityfs", "shm", "sunrpc", "sysfs", "systemd-1", "tmpfs", "autofs", "rpc_pipefs",
 	}
 
