@@ -15,10 +15,10 @@ import (
 )
 
 type Args struct {
-	Host        []string `json:"host"`
-	Index       string   `json:"index"`
-	Interval    int64    `json:"interval"`
-	SqlInstance string   `json:"sqlinstance"`
+	Host        interface{} `json:"host"`
+	Index       string      `json:"index"`
+	Interval    int64       `json:"interval"`
+	SqlInstance string      `json:"sqlinstance"`
 }
 
 type program struct {
@@ -61,12 +61,14 @@ func (p *program) reqDo() {
 		return
 	}
 
-	log.Println(string(sb))
-	if len(p.args.Host) == 0 {
+	hosts := getHost(p.args.Host)
+
+	log.Println("host: ", hosts)
+	if len(hosts) == 0 {
 		return
 	}
 
-	cfg := elasticsearch.Config{Addresses: p.args.Host}
+	cfg := elasticsearch.Config{Addresses: hosts}
 	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		log.Println("NewClient: %v", err)
@@ -99,6 +101,21 @@ func getConfigPath() string {
 	name := execname[:len(execname)-len(ext)]
 
 	return filepath.Join(dir, name+".json")
+}
+
+func getHost(h interface{}) []string {
+	hosts := []string{}
+	switch v := h.(type) {
+	case []interface{}:
+		for _, val := range h.([]interface{}) {
+			hosts = append(hosts, val.(string))
+		}
+	case string:
+		hosts = append(hosts, h.(string))
+	default:
+		_ = v
+	}
+	return hosts
 }
 
 func getArgs() (Args, error) {
