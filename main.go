@@ -15,10 +15,10 @@ import (
 )
 
 type Args struct {
-	Host        string `json:"host"`
-	Index       string `json:"index"`
-	Interval    int64  `json:"interval"`
-	SqlInstance string `json:"sqlinstance"`
+	Host        []string `json:"host"`
+	Index       string   `json:"index"`
+	Interval    int64    `json:"interval"`
+	SqlInstance string   `json:"sqlinstance"`
 }
 
 type program struct {
@@ -66,7 +66,7 @@ func (p *program) reqDo() {
 		return
 	}
 
-	cfg := elasticsearch.Config{Addresses: []string{p.args.Host}}
+	cfg := elasticsearch.Config{Addresses: p.args.Host}
 	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		log.Println("NewClient: %v", err)

@@ -40,7 +40,7 @@ go build
 
 ```json
 {
-	"host": "http://localhost:9200",
+	"host": [ "http://localhost:9200", "http://localhost2:9200"],
 	"index": "perf",
 	"interval": 5,
 	"sqlinstance": ""
