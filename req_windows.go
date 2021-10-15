@@ -90,12 +90,12 @@ func ReqCounter(sqlInstance string) map[string]interface{} {
 	mc["Memory"] = addCounter(q, `\Memory\% Committed Bytes In Use`)
 
 	if len(sqlInstance) > 0 {
-		mc["BatchRequests"] = addCounter(q, fmt.Sprintf(`\%s:SQL Statistics\Batch Requests/sec`, sqlInstance))
+		mc["BatchRequests"] = addCounter(q, fmt.Sprintf(`\MSSQL$ %s:SQL Statistics\Batch Requests/sec`, sqlInstance))
 		if mc["BatchRequests"] == nil {
 			delete(mc, "BatchRequests")
 		}
 
-		mc["UserConnections"] = addCounter(q, fmt.Sprintf(`\%s:General Statistics\User Connections`, sqlInstance))
+		mc["UserConnections"] = addCounter(q, fmt.Sprintf(`\MSSQL$ %s:General Statistics\User Connections`, sqlInstance))
 		if mc["UserConnections"] == nil {
 			delete(mc, "UserConnections")
 		}
