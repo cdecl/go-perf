@@ -63,7 +63,7 @@ func (p *program) reqDo() {
 
 	hosts := getHost(p.args.Host)
 
-	log.Println("host: ", hosts)
+	log.Println(string(sb))
 	if len(hosts) == 0 {
 		return
 	}
@@ -111,7 +111,9 @@ func getHost(h interface{}) []string {
 			hosts = append(hosts, val.(string))
 		}
 	case string:
-		hosts = append(hosts, h.(string))
+		if len(h.(string)) > 0 {
+			hosts = append(hosts, h.(string))
+		}
 	default:
 		_ = v
 	}
